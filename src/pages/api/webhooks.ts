@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Readable } from 'stream'
 import Stripe from "stripe";
-import { stripe } from "../../../services/stripe";
+import { stripe } from "../../services/stripe";
 
 async function buffer(readable: Readable) {
   const chunks = [];
@@ -21,6 +21,10 @@ export const config = {
   }
 }
 
+const relevantEvents = new Set([
+  'checkout.session.completed'
+])
+
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if(req.method === 'POST') {
@@ -35,7 +39,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(400).send(`Webhook Error: ${err.message}`)
     }
 
-    res.status(200).json({ ok: true })
+    const { type } = event;
+
+    if(relevantEvents.has(type)) {
+      console.log('evento recebido', event)
+    }
+
+    res.json({ received: true })
   } else {
     res.setHeader('Allow', 'POST');
     res.status(405).end('Method not allowed');
