@@ -12,6 +12,7 @@ module.exports = {
   collectCoverageFrom: [
     "src/**/*.ts(x)",
     "!src/**/*.spec.ts(x)",
+    "!src/**/_app.tsx",
   ],
   coverageReporters: ["lcov", "json"],
 };
