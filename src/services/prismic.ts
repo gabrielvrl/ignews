@@ -1,11 +1,12 @@
-import * as prismic from '@prismicio/client'
+import Prismisc from '@prismicio/client'
 
 export const repositoryName = process.env.PRISMIC_ENDPOINT;
 
-export default function getPrismicClient(req?: unknown) {
-  const client = prismic.createClient(repositoryName, {
-    accessToken: process.env.PRISMIC_ACCESS_TOKEN,
+export function getPrismicClient(req?: unknown) {
+  const prismic = Prismisc.client(process.env.PRISMIC_ENDPOINT, {
+    req: req,
+    accessToken: process.env.PRISMISC_ACCESS_TOKEN
   })
 
-  return client;
+  return prismic
 }

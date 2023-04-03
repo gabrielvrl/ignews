@@ -1,52 +1,44 @@
 import { GetStaticProps } from 'next';
-import Head from 'next/head';
-import * as prismic from '@prismicio/client'
-import styles from './styles.module.scss';
-import getPrismicClient from '../../services/prismic';
-import { RichText } from 'prismic-dom'
-import Link from 'next/link';
+import { getPrismicClient } from '../../services/prismic';
+import { RichText } from 'prismic-dom';
+import Prismic from '@prismicio/client';
 
 type Post = {
   slug: string;
   title: string;
   excerpt: string;
   updatedAt: string;
-}
+};
 
 interface PostsProps {
   posts: Post[];
 }
 
-export default function Posts({ posts }: PostsProps){
-  return(
-    <>
-      <Head>
-        <title>Posts | Ignews</title>
-      </Head>
-
-      <main className={styles.container}>
-        <div className={styles.posts}>
-          {posts.map(post => (
-            <Link key={post.slug} href={`/posts/${post.slug}`}>
-              {/* <a> */}
-                <time>{post.updatedAt}</time>
-                <strong>{post.title}</strong>
-                <p>{post.excerpt}</p>
-              {/* </a> */}
-            </Link>
-          ))}
-        </div>
-      </main>
-    </>
-  )
+export default function Posts({ posts }: PostsProps) {
+  return (
+    <div>
+      <h1>Posts</h1>
+      <ul>
+        {posts.map(post => (
+          <li key={post.slug}>
+            <a href="#">{post.title}</a>
+            <p>{post.excerpt}</p>
+            <small>{post.updatedAt}</small>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const prismicClient = getPrismicClient();
+  const prismic = getPrismicClient();
 
-  const response = await prismicClient.getAllByType('publication');
+  const response = await prismic.query(
+    Prismic.Predicates.at('document.type', 'publication')
+  );
 
-  const posts = response.map(post => {
+  const posts = response.results.map(post => {
     return {
       slug: post.uid,
       title: RichText.asText(post.data.title),
