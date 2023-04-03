@@ -1,5 +1,5 @@
 import { GetStaticPaths, GetStaticProps } from "next"
-import { getSession, useSession } from "next-auth/client";
+import { getSession, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
 import router, { useRouter } from "next/router";
@@ -20,10 +20,11 @@ interface PostPreviewProps {
 export default function PostPreview({ post }: PostPreviewProps) {
   const router = useRouter();
 
-  const [session] = useSession();
+  const {data: session, status}= useSession();
+
 
   useEffect(() => {
-    if(session?.activeSubscription) {
+    if(status) {
       router.push(`/posts/${post.slug}`)
     }
   }, [session])
@@ -47,7 +48,8 @@ export default function PostPreview({ post }: PostPreviewProps) {
           <div className={styles.continueReading}>
             Wanna continue reading?
             <Link href="/">
-              <a href="">Subscribe Now 🤗</a>
+              Subscribe Now 🤗
+              {/* <a>Subscribe Now 🤗</a> */}
             </Link>
           </div>
         </article>
@@ -64,13 +66,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  // const [session] = useSession();
+  const { data: session, status } = useSession();
 
-  // useEffect(() => {
-  //   if(session?.activeSubscription) {
-  //     router.push(`/posts/&{post.slug}`)
-  //   }
-  // }, [session])
+  useEffect(() => {
+    if(status) {
+      router.push(`/posts/&{post.slug}`)
+    }
+  }, [session, status])
 
 
   const { slug } = params;
